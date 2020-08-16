@@ -6,6 +6,7 @@ class ScanPage extends StatelessWidget {
     color: Colors.grey,
     size: 20,
   );
+
   @override
   Widget build(BuildContext context) {
     return new Scaffold(

@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'dart:async';
-import 'package:flutter/services.dart';
+import 'package:flutter_blue/flutter_blue.dart';
+
 import 'scan.dart';
+import 'bluetooth_off.dart';
 
 void main() {
   runApp(MyApp());
@@ -29,7 +30,18 @@ class MyApp extends StatelessWidget {
         // closer together (more dense) than on mobile platforms.
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: MyHomePage(),
+        home: StreamBuilder<BluetoothState>(
+            stream: FlutterBlue.instance.state,
+            initialData: BluetoothState.unknown,
+            builder: (c, snapshot) {
+              final state = snapshot.data;
+              if (state == BluetoothState.on) {
+                return MyHomePage();
+              }
+              return BluetoothOffScreen(state: state);
+            }
+        ),
+//      home: MyHomePage(),
       routes: <String, WidgetBuilder>{
         '/home': (BuildContext context) => new MyHomePage(),
         '/scanpage': (BuildContext context) => new ScanPage()
@@ -37,6 +49,7 @@ class MyApp extends StatelessWidget {
     );
   }
 }
+
 
 class MyHomePage extends StatefulWidget {
   MyHomePage({Key key, this.title}) : super(key: key);
@@ -57,7 +70,6 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  static const platform = const MethodChannel('samples.flutter.dev/smart_key_app');
 
   @override
   Widget build(BuildContext context) {
@@ -87,11 +99,13 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
         ],
       ),
-      body: ListView(
-        children: [
-          _menuItem("deviceName1", Icon(Icons.directions_car)),
-          _menuItem("deviceName2", Icon(Icons.directions_car)),
-        ],
+      body: Container(
+        child:ListView(
+          children: [
+            _menuItem("deviceName1", Icon(Icons.directions_car)),
+            _menuItem("deviceName2", Icon(Icons.directions_car)),
+          ],
+        ),
       ),
     );
   }
